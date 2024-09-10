@@ -1,0 +1,153 @@
+openapi: 3.0.3
+info:
+  title: Управление задачами
+  description: REST API, который позволит создавать, получать, обновлять и удалять задачу.
+  version: 1.0.0
+servers: 
+  - url: https://primer.com/api/
+tags:
+  - name: tasks
+    description: Все задачи
+paths:
+  /tasks:
+    get:
+      tags:
+        - tasks
+      description: Получить список всех задач
+      summary: Получить список всех задач в системе
+      responses:
+        '200':
+          description: Успешно отображен список всех задач
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '500':
+          description: Внутренняя ошибка сервера
+    post: 
+      tags:
+        - tasks
+      description: Создает новую задачу
+      summary: Создает новую задачу в системе
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '201':
+          description: Задача создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Некорректный ввод
+        '500':
+          description: Внутренняя ошибка сервера
+  /tasks/{id}:
+    get:
+      tags:
+        - tasks
+      description: Получить задачу по идентификатору
+      summary: Получает задачу из системы
+      parameters:
+        - in: path
+          name: id
+          description: ID задачи
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Задача найдена            
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Задача не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+    put:
+      tags:
+        - tasks
+      description: Обновить задачу по идентификатору
+      summary: Обновляет задачу в системе
+      parameters: 
+        - in: path
+          name: id
+          description: ID задачи
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      requestBody: 
+        required: true 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: Задача изменена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Некорректный ввод
+        '404':
+          description: Задача не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+    delete:
+      tags:
+        - tasks
+      description: Удалить задачу по идентификатору
+      summary: Удаляет задачу из системы
+      parameters: 
+        - in: path
+          name: id
+          description: ID задачи
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Задача удалена
+        '400':
+          description: Некорректный ввод
+        '404':
+          description: Задача не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+components: 
+  schemas:
+    Task: 
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title: 
+          type: string
+          example: "Задача 1"
+        description: 
+          type: string
+          example: "Описание задачи"
+        status: 
+          type: string
+          example: "Выполнена"
+      required:
+        - title
+        - description
+        - status
