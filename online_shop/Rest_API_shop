@@ -1,0 +1,161 @@
+openapi: 3.0.0
+info:
+  title: Сценарий для интернет-магазина
+  description: REST API, который позволит просматривать список товаров с кратким описанием, просматривать страницу товара, добавлять товар в корзину.
+  version: 1.0.0
+servers: 
+  - url: https://primer.com/api
+tags: 
+  - name: products
+    description: Все товары
+  - name: cart
+    description: Корзина покупок
+paths:
+  /products:
+    get:
+      tags:
+        - products
+      description: Получить список товаров с кратким описанием
+      summary: Получить список всех товаров
+      responses: 
+        '200':
+          description: Успешно отображен список всех товаров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+          examples:
+            application/json:
+              value: [
+                {
+                  "id": 1,
+                  "title": "Товар 1",
+                  "price": 150.00,
+                  "size": "M",
+                  "color": "Белый"
+                },
+                {
+                  "id": 2,
+                  "title": "Товар 2",
+                  "price": 200.00,
+                  "size": null,
+                  "color": "Черный"
+                }
+              ]
+  /products/{id}:
+    get:
+      tags:
+        - products
+      description: Посмотреть данные о товаре по ID
+      summary: Посмотреть конкретный товар
+      parameters:
+        - in: path
+          name: id
+          description: ID товара
+          required: true
+          schema: 
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Товар найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          examples:
+            application/json:
+              value: {
+                "id": 1,
+                "title": "Товар 1",
+                "price": 150.00,
+                "size": "M",
+                "color": "Белый"
+              }
+        '404':
+          description: Товар не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Товар не найден"
+  /cart:
+    post:
+      tags: 
+        - cart
+      description: Добавить товар в корзину по ID
+      summary: Добавить товар в корзину
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product:
+                  $ref: '#/components/schemas/Product'
+                quantity:
+                  type: integer
+                  example: 1
+      responses:
+        '201':
+          description: Товар добавлен в корзину
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Товар успешно добавлен в корзину"
+                  cartItem:
+                    $ref: '#/components/schemas/CartItem'
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Неверный ID товара или количество"
+components:
+  schemas:
+    Product:
+      type: object
+      properties: 
+        id: 
+          type: integer
+          example: 1
+        title: 
+          type: string
+          example: "Товар 1"
+        price:
+          type: number
+          format: float
+          minimum: 0.00
+          maximum: 1000000.00
+          example: 150.00
+        size:
+          type: string
+          example: "M"
+          nullable: true
+        color:
+          type: string
+          example: "Белый"
+          nullable: true
+    CartItem:
+      type: object
+      properties:
+        product:
+          $ref: '#/components/schemas/Product'
+        quantity:
+          type: integer
+          example: 1
